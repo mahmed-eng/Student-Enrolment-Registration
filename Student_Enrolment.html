@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Enrollment Program</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        form {
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        input,
+        select,
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        @media only screen and (max-width: 600px) {
+            form {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h2>Student Enrollment Program</h2>
+
+<form id="enrollmentForm">
+    <label for="name">Name:</label>
+    <input type="text" id="name" required>
+
+    <label for="class">Class:</label>
+    <input type="text" id="class" required>
+
+    <label for="fee">Fee:</label>
+    <input type="number" id="fee" required>
+
+    <label for="gender">Gender:</label>
+    <select id="gender">
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+    </select>
+
+    <label for="status">Status:</label>
+    <select id="status">
+        <option value="paid">Paid</option>
+        <option value="unpaid">Unpaid</option>
+    </select>
+
+    <label for="feeDate">Date of Paying Fee:</label>
+    <input type="date" id="feeDate" required>
+
+    <button type="button" onclick="enrollStudent()">Enroll Student</button>
+</form>
+
+<table id="studentTable">
+    <tr>
+        <th>Name</th>
+        <th>Class</th>
+        <th>Fee</th>
+        <th>Gender</th>
+        <th>Status</th>
+        <th>Fee Date</th>
+    </tr>
+</table>
+
+<script>
+    // Load existing records from localStorage on page load
+    window.onload = function () {
+        loadRecords();
+        checkUpcomingPayments();
+    };
+
+    function enrollStudent() {
+        var name = document.getElementById('name').value;
+        var studentClass = document.getElementById('class').value;
+        var fee = document.getElementById('fee').value;
+        var gender = document.getElementById('gender').value;
+        var status = document.getElementById('status').value;
+        var feeDate = document.getElementById('feeDate').value;
+
+        var table = document.getElementById('studentTable');
+        var row = table.insertRow(-1);
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        var cell3 = row.insertCell(2);
+        var cell4 = row.insertCell(3);
+        var cell5 = row.insertCell(4);
+        var cell6 = row.insertCell(5);
+
+        cell1.innerHTML = name;
+        cell2.innerHTML = studentClass;
+        cell3.innerHTML = fee;
+        cell4.innerHTML = gender;
+        cell5.innerHTML = status;
+        cell6.innerHTML = feeDate;
+
+        // Save the record to localStorage
+        saveRecord(name, studentClass, fee, gender, status, feeDate);
+
+        // Check if the status is unpaid and feeDate is in the past
+        if (status === 'unpaid' && new Date(feeDate) < new Date()) {
+            alert('Alert: ' + name + ' has not paid the fee as of ' + feeDate);
+        }
+
+        // Clear the form fields
+        document.getElementById('name').value = '';
+        document.getElementById('class').value = '';
+        document.getElementById('fee').value = '';
+        document.getElementById('gender').value = 'male';
+        document.getElementById('status').value = 'paid';
+        document.getElementById('feeDate').value = '';
+    }
+
+    function saveRecord(name, studentClass, fee, gender, status, feeDate) {
+        var records = JSON.parse(localStorage.getItem('studentRecords')) || [];
+        records.push({
+            name: name,
+            class: studentClass,
+            fee: fee,
+            gender: gender,
+            status: status,
+            feeDate: feeDate
+        });
+        localStorage.setItem('studentRecords', JSON.stringify(records));
+    }
+
+    function loadRecords() {
+        var records = JSON.parse(localStorage.getItem('studentRecords')) || [];
+        var table = document.getElementById('studentTable');
+
+        for (var i = 0; i < records.length; i++) {
+            var row = table.insertRow(-1);
+            var cell1 = row.insertCell(0);
+            var cell2 = row.insertCell(1);
+            var cell3 = row.insertCell(2);
+            var cell4 = row.insertCell(3);
+            var cell5 = row.insertCell(4);
+            var cell6 = row.insertCell(5);
+
+            cell1.innerHTML = records[i].name;
+            cell2.innerHTML = records[i]['class'];
+            cell3.innerHTML = records[i].fee;
+            cell4.innerHTML = records[i].gender;
+            cell5.innerHTML = records[i].status;
+            cell6.innerHTML = records[i].feeDate;
+
+            // Check if the status is unpaid and feeDate is in the past
+            if (records[i].status === 'unpaid' && new Date(records[i].feeDate) < new Date()) {
+                alert('Alert: ' + records[i].name + ' has not paid the fee as of ' + records[i].feeDate);
+            }
+        }
+    }
+
+    function checkUpcomingPayments() {
+        var records = JSON.parse(localStorage.getItem('studentRecords')) || [];
+
+        for (var i = 0; i < records.length; i++) {
+            var feeDate = new Date(records[i].feeDate);
+            var currentMonth = new Date().getMonth();
+            var upcomingPaymentDate = new Date(new Date().getFullYear(), currentMonth, feeDate.getDate());
+
+            // Check if the status is unpaid and the upcoming payment date is within a week
+            if (records[i].status === 'unpaid' && upcomingPaymentDate - new Date() < 7 * 24 * 60 * 60 * 1000) {
+                console.log('Notification: ' + records[i].name + ' has an upcoming fee payment on ' + feeDate.toDateString());
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
